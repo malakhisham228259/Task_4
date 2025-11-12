@@ -65,7 +65,7 @@ describe('Authentication controller integration', () => {
   });
 
   /*
-  TODO: test login behaviour
+  Test login behaviour
   - attempt login request with user credentials
   - expect a 200 response
   - expect a JWT token in the response
@@ -73,8 +73,32 @@ describe('Authentication controller integration', () => {
   - store the issued token for use in subsequent tests
   */
   test('authenticates the same user and issues a fresh JWT', async () => {
-    // This test will always fail until the TODO above is implemented.
-    expect(true).toBe(false);
+    const response = await fetch(`${baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: credentials.email,
+        password: credentials.password
+      })
+    });
+
+    expect(response.status).toBe(200);
+
+    const payload = await response.json();
+    expect(payload.token).toBeTruthy();
+    expect(payload.user.email).toBe(credentials.email.toLowerCase());
+    expect(payload.user).not.toHaveProperty('passwordHash');
+
+    // Store the fresh token for subsequent tests
+    issuedToken = payload.token;
+
+    // Optional: verify that /auth/me works with this new token
+    const response2 = await fetch(`${baseUrl}/auth/me`, {
+      headers: { Authorization: `Bearer ${issuedToken}` }
+    });
+    const mePayload = await response2.json();
+    expect(response2.status).toBe(200);
+    expect(mePayload.user.email).toBe(credentials.email.toLowerCase());
   });
 
   test('returns the public profile for the currently authenticated user', async () => {

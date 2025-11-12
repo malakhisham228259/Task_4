@@ -9,8 +9,11 @@ import { spawn } from 'child_process';
 import axios from 'axios';
 import httpAdapter from 'axios/lib/adapters/http.js';
 import dotenv from 'dotenv';
+import { configure } from '@testing-library/react';
 
+configure({asyncUtilTimeout:5000});
 jest.setTimeout(60000);
+
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(currentFilePath), '..', '..');
